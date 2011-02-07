@@ -1,0 +1,45 @@
+PAYMENT SAMPLE:
+
+Included is a code sample of a Payment Engine I wrote as a contractor 
+
+PaymentEngine.php is a class that finds all payable orders based
+on many variables -- debit/credits, force-pay, discount for early
+payment, etc and creates a payment object
+
+The PaymentEngine creates an electronic file for a specfic bank.
+I've included the basic code for a bank called SVB.
+
+To allow the PaymentEngine to be agnostic about what bank it uses,
+I've created a factory that returns specific bank based on an ini
+value.
+
+The bank specific Generator inherits certain qualities from an Abstract class (also included).
+
+And the Utility class provides static operations applicable to all classes.
+
+
+API SAMPLE:
+
+Problem:  Gathering data about shipments from many different carriers
+(example included: UPS) We may know about shipments, but we want
+to continue to ping the APIs to find out the progress of the shipment
+
+
+This is a command line process that begins with Track.php
+
+The UPS child class doesn't have much in it except the specification
+of a Data Access Object.  It inherits most details from the Abstract
+class (included)
+
+Other issues: Though we get various different pieces of data from
+various carriers, we need to be able to unify them into a
+trackingResponse object from their respective apis.  This information
+eventually becomes a shipment. (TrackingResponse.php)
+
+Also: There are other handlers that may need to do various things
+to the TrackingResponse object to make sure it's ready to become a
+shipment.  I've included the ShipmentHandler. This handler handles
+the case where a Carrier will give us information about the delivery
+date of a shipment, without knowing whether it was ever Picked Up.
+Since other functionality is based on a Pick Up Date, we need to
+insert an date based on the average for that carrier.
