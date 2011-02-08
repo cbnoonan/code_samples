@@ -6,50 +6,46 @@ $tsp = new TSP();
 
 
 foreach ($lines as $line) {
-//   print "LINE: " . $line;
    preg_match('/^(\S+)\t(\-?[0-9\.]+)\t(\-?[0-9\.]+)/', $line, $matches); 
    $city = $matches[1];
    $latitude = $matches[2];
    $longitude = $matches[3]; 
-//   var_dump($matches);
-   print "CITY: " . $city . " \n";
-   print " lat: ". $latitude . " long: " . $longitude . " \n";
    $tsp->add($city, $latitude, $longitude);
-   
-//always travel to the unvisited node that is closest to the one you’re currently at.
 } 
 
 $tsp->compute();
 
 
-echo 'Shortest Distance: '.$tsp->getShortestDistance();
-print "\n";
-echo 'Shortest Route: ';
+//echo 'Shortest Distance: '.$tsp->getShortestDistance();
+//print "\n";
+//echo 'Shortest Route: ';
+//print_r($tsp->getShortestRoute());
 
-print_r($tsp->getShortestRoute());
+foreach ($tsp->getShortestRoute() as $city) {
+   print($city. "\n");
+}
 
-print "\n";
-echo 'Num Routes: '.count($tsp->getAllRoutes());
-print "\n";
+//print "\n";
+//echo 'Num Routes: '.count($tsp->getAllRoutes());
+//print "\n";
 
-echo 'Matching shortest Routes: ';
+//echo 'Matching shortest Routes: ';
+//print_r($tsp->getMatchingShortestRoutes());
 
-print_r($tsp->getMatchingShortestRoutes());
-
-print "\n";
+//print "\n";
 //echo 'All Routes: ';
-
 //print_r($tsp->getAllRoutes());
 
-    /** 
-     * Traveling Salesman Problem 
-     *
-     *  
-     * It takes any number of coordinates and brute force calculates the shortest distance to travel to all those points.
-     * It doesn't do anything clever like forcing a starting / ending point, however this could easily be implemented.
-     *
-     */
-
+/** 
+ * Traveling Salesman Problem 
+ *
+ *  
+ * It takes any number of coordinates and brute force calculates the shortest distance to travel to all those points.
+ * It doesn't do anything clever like forcing a starting / ending point, however this could easily be implemented.
+ *
+ * Note on solving: always travel to the unvisited node that is closest to the one you’re currently at.
+ *
+ */
 class TSP {
 
     /**
@@ -125,14 +121,15 @@ class TSP {
         }
         $locations = array_keys($locations);
         
-        $this->allRoutes = $this->getAllPermutations($locations);
+//        $this->allRoutes = $this->getAllPermutations($locations);
+        $this->allRoutes = $this->getAllPermutationsBeginningWithBeijing($locations);
         
         foreach ($this->allRoutes as $key => $permutation){
             $i = 0;
             $total = 0;
             foreach ($permutation as $value){
                 if ($i < count($this->locations) -1){
-                    $total += $this->distance($this->latitudes[$permutation[$i]],
+                    $total += $this->calculateDistance($this->latitudes[$permutation[$i]],
                                               $this->longitudes[$permutation[$i]],
                                               $this->latitudes[$permutation[$i+1]],
                                               $this->longitudes[$permutation[$i+1]]
@@ -142,9 +139,7 @@ class TSP {
             }
             $this->allRoutes[$key]['distance'] = $total;
             if ($total < $this->shortestDistance || $this->shortestDistance == 0){
-//                $this->shortestDistance = $total;
                 $this->setShortestDistance($total);
-//                $this->shortestRoute = $permutation;
                 $this->setShortestRoute($permutation);
                 $this->shortestRoutes = array();
             }
@@ -162,7 +157,7 @@ class TSP {
      * @param $latutude2 float
      * @param $longitude2 float
      */
-    function distance($latutude1, $longitude1, $latutude2, $longitude2) { 
+    function calculateDistance($latutude1, $longitude1, $latutude2, $longitude2) { 
         if ($latutude1 == $latutude2 && $longitude1 == $longitude2) return 0;
 
         $theta = $longitude1 - $longitude2; 
@@ -207,6 +202,19 @@ class TSP {
 
         return $allPermutations;
     }
+
+    private function getAllPermutationsBeginningWithBeijing($locations) {
+        $allPermutations = $this->getAllPermutations($locations);
+
+        $routesBeginningWithBeijing = array();
+        foreach ($allPermutations as $p) {
+           if ($p[0] == "Beijing") {
+              $routesBeginningWithBeijing[] = $p;
+           }
+        }
+        return $routesBeginningWithBeijing;
+    }
+        
         
     /**
      * Return an array of the shortest possible route
@@ -251,6 +259,10 @@ class TSP {
      */
     public function getAllRoutes(){
         return $this->allRoutes;
+    }
+
+    public function setAllRoutes($allRoutes) {
+       $this->allRoutes = $allRoutes;
     }
 }
 
