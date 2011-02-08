@@ -1,0 +1,4 @@
+Beijing	39.93	116.40  
+Vladivostok	43.9	131.54
+Dakar	14.40	-17.28
+Singapore	1.14	103.55
