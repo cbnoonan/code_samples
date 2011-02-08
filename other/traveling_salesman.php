@@ -1,35 +1,47 @@
 <?php
 
-$lines = file('cities.txt');
+main();
 
-$tsp = new TSP();
+/**
+ * Main function of ACTION.  Parse local file into an array of cities and
+ * coordinates.  Calculate distance using the TSP calculator.
+ * Return quickest path results starting with Beijing.
+ */
+public function main() {
+  $lines = file('cities.txt');
 
+  $tsp = new TravelingSalesmanProblem();
 
-foreach ($lines as $line) {
-   preg_match('/^(\S+)\t(\-?[0-9\.]+)\t(\-?[0-9\.]+)/', $line, $matches); 
-   $city = $matches[1];
-   $latitude = $matches[2];
-   $longitude = $matches[3]; 
-   $tsp->add($city, $latitude, $longitude);
-} 
+   foreach ($lines as $line) {
+      preg_match('/^(\S+)\t(\-?[0-9\.]+)\t(\-?[0-9\.]+)/', $line, $matches); 
+      $city = $matches[1];
+      $latitude = $matches[2];
+      $longitude = $matches[3]; 
+      $tsp->add($city, $latitude, $longitude);
+   } 
 
-$tsp->compute();
+   $tsp->compute();
 
-foreach ($tsp->getShortestRoute() as $city) {
-   print($city. "\n");
+   foreach ($tsp->getShortestRoute() as $city) {
+      print($city. "\n");
+   }
 }
+
 
 /** 
  * Traveling Salesman Problem 
  *
  *  
- * It takes any number of coordinates and brute force calculates the shortest distance to travel to all those points.
- * It doesn't do anything clever like forcing a starting / ending point, however this could easily be implemented.
+ * It takes any number of coordinates and brute force calculates the shortest 
+ *    distance to travel to all those points.
+ * It doesn't do anything clever like forcing a starting / ending point, 
+ *    however this could easily be implemented.
  *
- * Note on solving: always travel to the unvisited node that is closest to the one you’re currently at.
+ * Note on solving: always travel to the unvisited node that is closest 
+ *    to the one you’re currently at.
  *
  */
-class TSP {
+class TravelingSalesmanProblem {
 
     /**
      * all locations to visit
@@ -66,6 +78,8 @@ class TSP {
      */
     private $allRoutes;
 
+    const START_CITY = "BEIJING";
+
     /**
      * Constructor
      *
@@ -95,23 +109,22 @@ class TSP {
     /**
      * The main function that does the calculations
      */
-    public function compute(){
+    public function compute() {
         $locations = $this->locations;
         
-        foreach ($locations as $city => $coordinates){
+        foreach ($locations as $city => $coordinates) {
             $this->longitudes[$city] = $coordinates['longitude'];
             $this->latitudes[$city] = $coordinates['latitude'];
         }
         $locations = array_keys($locations);
         
-//        $this->allRoutes = $this->getAllPermutations($locations);
         $this->allRoutes = $this->getAllPermutationsBeginningWithBeijing($locations);
         
-        foreach ($this->allRoutes as $key => $permutation){
+        foreach ($this->allRoutes as $key => $permutation) {
             $i = 0;
             $total = 0;
-            foreach ($permutation as $value){
-                if ($i < count($this->locations) -1){
+            foreach ($permutation as $value) {
+                if ($i < (count($this->locations) -1) ) {
                     $total += $this->calculateDistance($this->latitudes[$permutation[$i]],
                                               $this->longitudes[$permutation[$i]],
                                               $this->latitudes[$permutation[$i+1]],
@@ -121,12 +134,14 @@ class TSP {
                 $i++;
             }
             $this->allRoutes[$key]['distance'] = $total;
-            if ($total < $this->shortestDistance || $this->shortestDistance == 0){
-                $this->setShortestDistance($total);
-                $this->setShortestRoute($permutation);
+            if ($total < $this->shortestDistance || $this->shortestDistance == 0) {
+                $this->shortestDistance = $total;
+//                $this->setShortestDistance($total);
+                $this->shortestRoute = $permutation;
+//                $this->setShortestRoute($permutation);
                 $this->shortestRoutes = array();
             }
-            if ($total == $this->shortestDistance){
+            if ($total == $this->shortestDistance) {
                 $this->shortestRoutes[] = $permutation;
             }
         }
@@ -135,31 +150,47 @@ class TSP {
     /**
      * Work out the distance between 2 longitude and latitude pairs
      *
+     * This uses the ‘haversine’ formula to calculate great-circle distances between 
+     *  the two points – that is, the shortest distance over the earth’s surface – 
+     *  giving an ‘as-the-crow-flies’ distance between the points (ignoring any hills!).
+     *
+     * Haversine formula:
+     *
+     * R = earth’s radius (mean radius = 6,371km)
+     * Δlat = lat2− lat1
+     * Δlong = long2− long1
+     * a = sin²(Δlat/2) + cos(lat1).cos(lat2).sin²(Δlong/2)
+     * c = 2.atan2(√a, √(1−a))
+     * d = R.c
+     *
+     * (Note that angles need to be in radians to pass to trig functions).
+     *
      * @param $latutude1 float
      * @param $longitude1 float
      * @param $latutude2 float
      * @param $longitude2 float
      */
-    function calculateDistance($latutude1, $longitude1, $latutude2, $longitude2) { 
+    private function calculateDistance($latutude1, $longitude1, $latutude2, $longitude2) { 
         if ($latutude1 == $latutude2 && $longitude1 == $longitude2) return 0;
 
         $theta = $longitude1 - $longitude2; 
 
+        // convert to radians from degrees... the earth is a sphere.
         $distance = sin(deg2rad($latutude1)) * sin(deg2rad($latutude2)) + 
                 cos(deg2rad($latutude1)) * cos(deg2rad($latutude2)) * cos(deg2rad($theta)); 
         $distance = acos($distance); 
         $distance = rad2deg($distance); 
         $miles = $distance * 60 * 1.1515;
         
-        return $miles . "M";  // in miles
+        return $miles;  // in miles
     }
 
     /**
      * Borrowed from the PHP Cookbook
      *
-     * This equation can be represented like this: n! = n * ((n - 1)!) That is, the factorial for any 
-     * given number is equal to that number multiplied by the factorial of the number one lower - this 
-     *  is clearly a case for recursive functions! 
+     * This equation can be represented like this: n! = n * ((n - 1)!) That is, the 
+     *   factorial for any given number is equal to that number multiplied by the 
+     *   factorial of the number one lower - this is clearly a case for recursive functions! 
      *
      * @param $items hash of locations, with key index
      * @param $permutation array 
@@ -176,9 +207,9 @@ class TSP {
                 $newitems = $items;
                 $newpermutation = $permutation;
 
-                list($foo) = array_splice($newitems, $i, 1);
+                list($temporaryVariable) = array_splice($newitems, $i, 1);
 
-                array_unshift($newpermutation, $foo);
+                array_unshift($newpermutation, $temporaryVariable);
                 $this->getAllPermutations($newitems, $newpermutation);
             }
         }
@@ -187,11 +218,11 @@ class TSP {
     }
 
     private function getAllPermutationsBeginningWithBeijing($locations) {
-        $allPermutations = $this->getAllPermutations($locations);
+//        $allPermutations = $this->getAllPermutations($locations);
 
         $routesBeginningWithBeijing = array();
-        foreach ($allPermutations as $p) {
-           if ($p[0] == "Beijing") {
+        foreach ($this->getAllPermutations($locations) as $p) {
+           if (strtoupper($p[0]) == self::START_CITY) {
               $routesBeginningWithBeijing[] = $p;
            }
         }
@@ -204,12 +235,8 @@ class TSP {
      *
      * @return array
      */
-    public function getShortestRoute(){
+    public function getShortestRoute() {
         return $this->shortestRoute;
-    }
-
-    public function setShortestRoute($shortestRoute) {
-        $this->shortestRoute = $shortestRoute;
     }
 
     /**
@@ -218,7 +245,7 @@ class TSP {
      *
      * @return array of $shortestRoutes
      */
-    public function getMatchingShortestRoutes(){
+    public function getMatchingShortestRoutes() {
         return $this->shortestRoutes;
     }
 
@@ -227,12 +254,8 @@ class TSP {
      *
      * @return int
      */
-    public function getShortestDistance(){
+    public function getShortestDistance() {
         return $this->shortestDistance;
-    }
-
-    public function setShortestDistance($shortestDistance) {
-        $this->shortestDistance = $shortestDistance;
     }
 
     /**
@@ -240,7 +263,7 @@ class TSP {
      *
      * @return array
      */
-    public function getAllRoutes(){
+    public function getAllRoutes() {
         return $this->allRoutes;
     }
 
