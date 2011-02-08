@@ -19,13 +19,6 @@ class Merc_DAO_Davis_API_UPSDao implements Merc_DAO_Davis_API_Tracking {
    private $sleepSeconds;
    
    /**
-    * These things below are not likely to change, and so are not in config (at this time).
-    */
-   private $accessLicenseNumber = "******";
-   private $userId = "example";
-   private $password = "blahlblahfoo";
-
-   /**
     * ctor
     * inits $db adapter and logger
     */
