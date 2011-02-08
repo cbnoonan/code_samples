@@ -15,26 +15,9 @@ foreach ($lines as $line) {
 
 $tsp->compute();
 
-
-//echo 'Shortest Distance: '.$tsp->getShortestDistance();
-//print "\n";
-//echo 'Shortest Route: ';
-//print_r($tsp->getShortestRoute());
-
 foreach ($tsp->getShortestRoute() as $city) {
    print($city. "\n");
 }
-
-//print "\n";
-//echo 'Num Routes: '.count($tsp->getAllRoutes());
-//print "\n";
-
-//echo 'Matching shortest Routes: ';
-//print_r($tsp->getMatchingShortestRoutes());
-
-//print "\n";
-//echo 'All Routes: ';
-//print_r($tsp->getAllRoutes());
 
 /** 
  * Traveling Salesman Problem 
