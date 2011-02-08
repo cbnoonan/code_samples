@@ -136,9 +136,7 @@ class TravelingSalesmanProblem {
             $this->allRoutes[$key]['distance'] = $total;
             if ($total < $this->shortestDistance || $this->shortestDistance == 0) {
                 $this->shortestDistance = $total;
-//                $this->setShortestDistance($total);
                 $this->shortestRoute = $permutation;
-//                $this->setShortestRoute($permutation);
                 $this->shortestRoutes = array();
             }
             if ($total == $this->shortestDistance) {
