@@ -3,7 +3,7 @@
 main();
 
 /**
- * Main function of ACTION.  Parse local file into an array of cities and
+ * Main function.  Parse local file into an array of cities and
  * coordinates.  Calculate distance using the TSP calculator.
  * Return quickest path results starting with Beijing.
  */
