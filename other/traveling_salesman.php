@@ -7,10 +7,10 @@ main();
  * coordinates.  Calculate distance using the TSP calculator.
  * Return quickest path results starting with Beijing.
  */
-public function main() {
+function main() {
   $lines = file('cities.txt');
 
-  $tsp = new TravelingSalesmanProblem();
+  $tsp = new TravelingSalesmanProblem('Beijing');
 
    foreach ($lines as $line) {
       preg_match('/^(\S+)\t(\-?[0-9\.]+)\t(\-?[0-9\.]+)/', $line, $matches); 
@@ -34,8 +34,6 @@ public function main() {
  *  
  * It takes any number of coordinates and brute force calculates the shortest 
  *    distance to travel to all those points.
- * It doesn't do anything clever like forcing a starting / ending point, 
- *    however this could easily be implemented.
  *
  * Note on solving: always travel to the unvisited node that is closest 
  *    to the one you’re currently at.
@@ -78,13 +76,16 @@ class TravelingSalesmanProblem {
      */
     private $allRoutes;
 
-    const START_CITY = "BEIJING";
+    /**
+     * string specifying starting point 
+     */
+    private $startCity;
 
     /**
      * Constructor
      *
      */
-    public function __construct() {
+    public function __construct($startCity = '') {
         $this->locations  = array();
         $this->longitudes = array();
         $this->latitudes  = array();
@@ -93,6 +94,7 @@ class TravelingSalesmanProblem {
         $this->shortestRoutes   = array();
         $this->shortestDistance = 0;
         $this->allRoutes        = array();
+        $this->startCity        = $startCity;
     }
     
     /**
@@ -118,7 +120,7 @@ class TravelingSalesmanProblem {
         }
         $locations = array_keys($locations);
         
-        $this->allRoutes = $this->getAllPermutationsBeginningWithBeijing($locations);
+        $this->allRoutes = $this->getAllPermutationsBeginningWithStartCity($locations);
         
         foreach ($this->allRoutes as $key => $permutation) {
             $i = 0;
@@ -215,18 +217,22 @@ class TravelingSalesmanProblem {
         return $allPermutations;
     }
 
-    private function getAllPermutationsBeginningWithBeijing($locations) {
-//        $allPermutations = $this->getAllPermutations($locations);
-
-        $routesBeginningWithBeijing = array();
-        foreach ($this->getAllPermutations($locations) as $p) {
-           if (strtoupper($p[0]) == self::START_CITY) {
-              $routesBeginningWithBeijing[] = $p;
-           }
+    /**
+     * If $this->startCity is defined in the constructor, your starting point begins your trip
+     * and limits your possible routes.  Otherwise, return all possible routes.
+     */ 
+    private function getAllPermutationsBeginningWithStartCity($locations) {
+        if (!empty($this->startCity)) { 
+            $routesBeginningWithStartCity= array();
+            foreach ($this->getAllPermutations($locations) as $p) {
+               if ($p[0] == $this->startCity) {
+                  $routesBeginningWithStartCity[] = $p;
+               }
+            }
+            return $routesBeginningWithStartCity;
         }
-        return $routesBeginningWithBeijing;
+        return $this->getAllPermutations($locations);
     }
-        
         
     /**
      * Return an array of the shortest possible route
@@ -265,9 +271,6 @@ class TravelingSalesmanProblem {
         return $this->allRoutes;
     }
 
-    public function setAllRoutes($allRoutes) {
-       $this->allRoutes = $allRoutes;
-    }
 }
 
 ?>
