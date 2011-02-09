@@ -8,9 +8,9 @@ main();
  * Return quickest path results starting with Beijing.
  */
 function main() {
-  $lines = file('cities.txt');
+   $lines = file('cities.txt');
 
-  $tsp = new TravelingSalesmanProblem('Beijing');
+   $tsp = new TravelingSalesmanProblem('Beijing');
 
    foreach ($lines as $line) {
       preg_match('/^(\S+)\t(\-?[0-9\.]+)\t(\-?[0-9\.]+)/', $line, $matches); 
@@ -85,7 +85,7 @@ class TravelingSalesmanProblem {
      * Constructor
      *
      */
-    public function __construct($startCity = '') {
+    public function __construct($startCity = NULL) {
         $this->locations  = array();
         $this->longitudes = array();
         $this->latitudes  = array();
@@ -222,16 +222,16 @@ class TravelingSalesmanProblem {
      * and limits your possible routes.  Otherwise, return all possible routes.
      */ 
     private function getAllPermutationsBeginningWithStartCity($locations) {
+        $allPermutations = $this->getAllPermutations($locations);
+
         if (!empty($this->startCity)) { 
-            $routesBeginningWithStartCity= array();
-            foreach ($this->getAllPermutations($locations) as $p) {
-               if ($p[0] == $this->startCity) {
-                  $routesBeginningWithStartCity[] = $p;
+            foreach ($allPermutations  as $k => $p) {
+               if ($p[0] != $this->startCity) {
+                  unset($allPermutations[$k]);
                }
             }
-            return $routesBeginningWithStartCity;
         }
-        return $this->getAllPermutations($locations);
+        return $allPermutations;
     }
         
     /**
