@@ -7,7 +7,7 @@ f.each_line {|line|
 
 #puts contentsArray.inspect
 
-sorted_list =  contentsArray.sort_by{|x| x.length}
+sorted_list =  contentsArray.sort_by{|x| x.length}.reverse
 
 puts sorted_list.inspect
 
