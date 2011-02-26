@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 DEBUG=ENV.include?("DEBUG")
 
-
 # We implement a simplified variant of a Radix tree here.  In particular, we're
 # expanding substrings into sub-trees such that all keys in the tree are of
 # length 1.  It's naive and not overly memory-efficient, but it's nice and
