@@ -1,0 +1,3 @@
+include tictactoe/config/deployment.ini_tmpl
+recursive-include tictactoe/public *
+recursive-include tictactoe/templates *
