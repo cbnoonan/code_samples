@@ -1,0 +1,17 @@
+
+#action_list.loads_more
+  = render :partial => 'admin/actions/action', :collection => @collection
+  
+= more_link
+
+
+:javascript
+  $('.feed_item_container').live('hover',
+    function(e) {
+      if (e.type == 'mouseenter') {
+        $(this).find('.feed_details').css('opacity', 1);
+      } else {
+        $(this).find('.feed_details').css('opacity', .5);
+      }
+    }
+  );

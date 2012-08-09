@@ -1,0 +1,14 @@
+  
+.feed_item_container
+  .feed_title
+    = action.description_resolved(self)
+    - if action.body.present?
+      = nbsp(2)
+      = link_to("Show", 'javascript:void(0)', :class => 'show_hide')
+  - if action.body.present?
+    .feed_description{:style => "display:none"}
+      = simple_format action.body
+      
+  .feed_details
+    %span.feed_type= link_to(action.event_type_name, url_for(:events => action.event_type_name), :title => "Search for activity with type #{action.event_type_name}", :class => 'tag')
+    %span.feed_dt=dt action.event_at

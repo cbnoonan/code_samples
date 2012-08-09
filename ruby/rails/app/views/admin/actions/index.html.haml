@@ -1,0 +1,77 @@
+- set_focus_field nil
+
+- if @title
+  %h1= @title
+
+= link_to('Search', 'javascript:void(0);', :id => 'search_toggle')
+
+%div#search_div
+  = form_tag({:action => 'index'}, :method => 'get', :id => 'search_form') do
+    %p
+      = label_tag :from
+      = text_field_tag :from_date, params[:from_date], :class => 'date_picker', :placeholder => "Date"
+      = text_field_tag :from_time, params[:from_time], :size => 5, :class => 'time_picker', :placeholder => "Time"
+    %p
+      = label_tag :to
+      = text_field_tag :to_date, params[:to_date], :class => 'date_picker', :placeholder => "Date"
+      = text_field_tag :to_time, params[:to_time], :size => 5, :class => 'time_picker', :placeholder => "Time"
+    %p
+      = label_tag :events
+      = text_field_tag :events, nil, "data-pre" => @events.to_json, :size => 60
+
+    %p  
+      = submit_tag "Search", :name => nil
+      = nbsp(2)
+      = link_to "Clear", '#', :id => 'clear'
+
+= render :partial => 'admin/actions/index'
+=# empty_table_helper(:partial => 'admin/actions/index', :collection => @actions, :message => 'No Activity.')
+
+:javascript
+
+  function noSearch() {
+    return !#{@show_search};
+  }
+  
+  if (noSearch()) {
+    $('div#search_div').hide();
+  }
+  
+  function setLinkText() {
+    var linkText = $('#search_div').is(":visible") ? "Hide Search" : "Search";
+    $('#search_toggle').text(linkText);
+  }
+
+  setLinkText();
+  
+  $('#search_toggle').click(function() {
+    $('#search_div').slideToggle('fast', function() {
+      setLinkText();
+    });
+  });
+  
+  $(function() {
+    $(".date_picker").datepicker({ dateFormat: 'yy-mm-dd' });
+    $(".time_picker").timePicker();
+  });
+
+  $(function() {
+    $("#events").tokenInput("/event_types.json?feed_type=#{@feed_type}", {
+      crossDomain: false,
+      theme: "facebook",
+      prePopulate: $("#events").data("pre")
+    });
+  });
+  
+  $('a.show_hide').live('click', function() {
+    var link = $(this);
+    $(this).parent().next('.feed_description').toggle('fast');
+    var newText = link.text() == 'Show' ? 'Hide' : 'Show';
+    link.text(newText);
+  });
+  
+  $('#clear').click(function() {
+    $(':input','#search_form').not(':submit').val('');
+    $('.token-input-token-facebook').remove();
+    return false;
+  });

@@ -1,0 +1,19 @@
+
+<h3>Save Current Configuration (all settings)</h3>
+<%= form_link_as_button "Download Current Configuration", save_config_url %>
+  
+
+<% form_tag restore_config_url, :class => 'page_form', :multipart => true do %>
+
+  <br />
+  <br />
+  <h3>Restore Configuration</h3>
+  
+  <div class="label_textf no_border">
+    <label for="file">Configuration File</label>
+    <input id="file" type="file" size="30" name="config_file"/>
+    <span class="page_form_help">upload and apply a saved configuration file</span>
+  </div>
+  
+  <%= submit_button 'Restore' %>
+<% end %>
