@@ -1,43 +1,65 @@
+require_relative 'card'
+
 class Deck
 
-
-	def initialize(includeJokers = false)
-
-		@cardsUsed = 0
-		cardsCreated = 0
+	def initialize(include_jokers = false)
+		@cards_used = 0
+		cards_created = 0
 		@deck = []
 
-		suits = ['Heart', 'Spade', 'Diamond', 'Club']
-
-		suits.each do |suit|
-			[1..13].each do |i|
-				@deck[cardsCreated] = Card(i, suit)
-				cardsCreated++
+		(0..3).each do |s|
+			(1..13).each do |v|
+				@deck[cards_created] = Card.new(v, s)
+				cards_created = cards_created + 1
 			end
 		end
 
-		if includeJokers
-			@deck[52] =  Card(1, Card.Joker);
-			@deck[53] =  Card[2, Card.Joker];
+		if include_jokers
+			@deck[52] =  Card.new(1, Card::JOKER)
+			@deck[53] =  Card.new(2, Card::JOKER)
 		end
 	end
 
 
     def shuffle
-    	@deck.shuffle
+    	@cards_used = 0
+
+    	# @deck.shuffle
+    	(@deck.length-1).downto(1) do |c|
+    		foo = rand
+    		random = foo * (c+1)
+    		temp = @deck[c]  # temp holds the value of the 51st card
+    		@deck[c] = @deck[random]
+    		@deck[random] = temp
+    	end
     end
 
-    def dealCard
-    	if @cardsUsed == @deck.size
+    def deal_card
+    	if @cards_used == @deck.size
     		raise Exception
     	end
-    	@cardsUsed++
-    	@deck[@cardsUsed - 1]
+    	@cards_used += @cards_used
+    	@deck[@cards_used - 1]
     end
 
-    def cardsLeft
-    	@deck.length - @cardsUsed
+    def cards_left
+    	@deck.length - @cards_used
+    end
+
+    def has_jokers?
+    	@deck.size == 54
     end
 
 
 end
+
+
+deck = Deck.new  #without includeJokers
+puts deck.shuffle
+puts deck.deal_card
+puts deck.has_jokers?
+
+deck_with_jokers = Deck.new(true)
+puts deck_with_jokers.shuffle
+puts deck_with_jokers.deal_card
+puts deck_with_jokers.has_jokers?
