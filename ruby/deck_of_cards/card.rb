@@ -31,6 +31,14 @@ class Card
     	@suit = suit
     end
 
+    def value
+        @value
+    end
+
+    def suit
+        @suit
+    end
+
     def get_suit_as_string
     	case @suit
 	    	when SPADES
@@ -98,3 +106,5 @@ end
 
 # card = Card.new(11, 3)
 # puts card.to_string
+# puts card.suit
+# puts card.value
